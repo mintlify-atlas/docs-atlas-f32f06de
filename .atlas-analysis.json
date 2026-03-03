@@ -1,0 +1,62 @@
+{
+  "projectType": "frontend",
+  "projectName": "shadcn Pricing Page",
+  "projectDescription": "Responsive and customizable pricing component built with shadcn/ui and Next.js",
+  "theme": "willow",
+  "primaryColor": "#7877C6",
+  "lightColor": "#A5A4E8",
+  "darkColor": "#5855A0",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/pricing",
+          "components/pricing-card",
+          "components/pricing-header",
+          "components/tab"
+        ]
+      },
+      {
+        "group": "Configuration",
+        "pages": [
+          "configuration/tiers",
+          "configuration/payment-frequencies",
+          "configuration/styling"
+        ]
+      },
+      {
+        "group": "Examples",
+        "pages": [
+          "examples/basic-usage",
+          "examples/custom-tiers",
+          "examples/theming"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Responsive pricing cards with payment frequency toggles",
+    "Smooth animated price transitions with NumberFlow",
+    "Customizable tier highlights and popular badges",
+    "Built with shadcn/ui and Tailwind CSS",
+    "TypeScript support with full type definitions"
+  ],
+  "publicApiSurface": [
+    "Pricing component - Main pricing section with cards and frequency toggle",
+    "PricingCard - Individual pricing tier card with features and CTA",
+    "PricingHeader - Header section with title, subtitle, and frequency selector",
+    "Tab - Animated tab component for frequency selection",
+    "TIERS configuration - Array of pricing tier definitions",
+    "PAYMENT_FREQUENCIES configuration - Payment frequency options",
+    "PricingTier interface - TypeScript interface for tier structure"
+  ]
+}
