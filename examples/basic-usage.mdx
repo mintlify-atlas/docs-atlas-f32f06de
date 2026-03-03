@@ -1,0 +1,312 @@
+---
+title: 'Basic Usage'
+description: 'Simple examples for integrating the Pricing component into your application'
+---
+
+## Quick Start
+
+The simplest way to get started with the shadcn-pricing-page component is to use the pre-built `Pricing` component with the default configuration.
+
+<Steps>
+  <Step title="Import the Component">
+    Import the `Pricing` component into your page or layout:
+
+    ```tsx
+    import { Pricing } from "@/components/Pricing";
+
+    export default function PricingPage() {
+      return <Pricing />;
+    }
+    ```
+  </Step>
+
+  <Step title="Configure Your Tiers">
+    The component automatically reads from `@/config/index.ts`. Make sure your tiers are configured:
+
+    ```tsx config/index.ts
+    export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+    export const TIERS = [
+      {
+        id: "free",
+        name: "Free",
+        price: {
+          monthly: "Free",
+          yearly: "Free",
+        },
+        description: "For hobby projects",
+        features: [
+          "Up to 3 projects",
+          "Basic analytics",
+          "Community support",
+        ],
+        cta: "Get Started",
+      },
+      // Add more tiers...
+    ];
+    ```
+  </Step>
+
+  <Step title="Run Your Application">
+    Start your development server and navigate to your pricing page:
+
+    ```bash
+    npm run dev
+    ```
+
+    Your pricing component should now be visible with all configured tiers!
+  </Step>
+</Steps>
+
+<Tip>
+  The `Pricing` component handles state management internally, so you don't need to manage the selected payment frequency yourself.
+</Tip>
+
+## Understanding the Component Structure
+
+The `Pricing` component is composed of three main parts:
+
+### 1. Main Pricing Component
+
+```tsx components/Pricing.tsx
+"use client";
+
+import { PricingCard } from "@/components/PricingCard";
+import { PricingHeader } from "@/components/PricingHeader";
+import { PAYMENT_FREQUENCIES, TIERS } from "@/config";
+import { useState } from "react";
+
+export const Pricing = () => {
+  const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+    PAYMENT_FREQUENCIES[0],
+  );
+
+  return (
+    <section className="flex flex-col items-center gap-10 py-10">
+      {/* Header with frequency toggle */}
+      <PricingHeader
+        title="Plans and Pricing"
+        subtitle="Receive unlimited credits when you pay yearly, and save on your plan."
+        frequencies={PAYMENT_FREQUENCIES}
+        selectedFrequency={selectedPaymentFreq}
+        onFrequencyChange={setSelectedPaymentFreq}
+      />
+
+      {/* Grid of pricing cards */}
+      <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {TIERS.map((tier, i) => (
+          <PricingCard
+            key={i}
+            tier={tier}
+            paymentFrequency={selectedPaymentFreq}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+```
+
+### 2. PricingHeader Component
+
+Handles the title, subtitle, and payment frequency toggle:
+
+```tsx components/PricingHeader.tsx
+import { Tab } from "@/ui/tab";
+
+export const PricingHeader = ({
+  title,
+  subtitle,
+  frequencies,
+  selectedFrequency,
+  onFrequencyChange,
+}: {
+  title: string;
+  subtitle: string;
+  frequencies: string[];
+  selectedFrequency: string;
+  onFrequencyChange: (frequency: string) => void;
+}) => (
+  <div className="space-y-7 text-center">
+    <div className="space-y-4">
+      <h1 className="text-4xl font-medium md:text-5xl">{title}</h1>
+      <p>{subtitle}</p>
+    </div>
+    <div className="mx-auto flex w-fit rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+      {frequencies.map((freq) => (
+        <Tab
+          key={freq}
+          text={freq}
+          selected={selectedFrequency === freq}
+          setSelected={onFrequencyChange}
+          discount={freq === "yearly"}
+        />
+      ))}
+    </div>
+  </div>
+);
+```
+
+### 3. PricingCard Component
+
+Renders individual pricing tiers (see [PricingCard component](/components/pricing-card) for details).
+
+## Customizing Header Text
+
+You can easily customize the header text by modifying the props passed to `PricingHeader`:
+
+<CodeGroup>
+```tsx Simple Title Change
+import { Pricing } from "@/components/Pricing";
+
+// Option 1: Create a wrapper component
+export const CustomPricing = () => {
+  return (
+    <section className="flex flex-col items-center gap-10 py-10">
+      <PricingHeader
+        title="Choose Your Plan"
+        subtitle="Start free, upgrade when you grow."
+        frequencies={PAYMENT_FREQUENCIES}
+        selectedFrequency={selectedPaymentFreq}
+        onFrequencyChange={setSelectedPaymentFreq}
+      />
+      {/* Rest of component... */}
+    </section>
+  );
+};
+```
+
+```tsx With Custom Component
+// Option 2: Copy and modify the Pricing component
+"use client";
+
+import { PricingCard } from "@/components/PricingCard";
+import { PricingHeader } from "@/components/PricingHeader";
+import { PAYMENT_FREQUENCIES, TIERS } from "@/config";
+import { useState } from "react";
+
+export const Pricing = () => {
+  const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+    PAYMENT_FREQUENCIES[0],
+  );
+
+  return (
+    <section className="flex flex-col items-center gap-10 py-10">
+      <PricingHeader
+        title="Transparent Pricing"
+        subtitle="No hidden fees. Cancel anytime."
+        frequencies={PAYMENT_FREQUENCIES}
+        selectedFrequency={selectedPaymentFreq}
+        onFrequencyChange={setSelectedPaymentFreq}
+      />
+
+      <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {TIERS.map((tier, i) => (
+          <PricingCard
+            key={i}
+            tier={tier}
+            paymentFrequency={selectedPaymentFreq}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+```
+</CodeGroup>
+
+## Adding Custom Wrapper
+
+Wrap the pricing component in a custom layout for additional styling:
+
+```tsx app/pricing/page.tsx
+import { Pricing } from "@/components/Pricing";
+
+export default function PricingPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      <div className="container mx-auto px-4">
+        <Pricing />
+      </div>
+    </div>
+  );
+}
+```
+
+<Note>
+  The `Pricing` component uses `"use client"` directive because it manages state for the payment frequency toggle. Make sure your parent component can handle client components.
+</Note>
+
+## Integration with Next.js App Router
+
+Here's how to integrate with Next.js 13+ App Router:
+
+```tsx app/pricing/page.tsx
+import { Pricing } from "@/components/Pricing";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pricing - Your App Name",
+  description: "Choose the perfect plan for your needs",
+};
+
+export default function PricingPage() {
+  return (
+    <main>
+      <Pricing />
+    </main>
+  );
+}
+```
+
+## Integration with Other Frameworks
+
+<CodeGroup>
+```tsx Remix
+import { Pricing } from "~/components/Pricing";
+
+export default function PricingRoute() {
+  return (
+    <div>
+      <Pricing />
+    </div>
+  );
+}
+
+export const meta = () => [
+  { title: "Pricing" },
+  { name: "description", content: "Choose your plan" },
+];
+```
+
+```tsx Vite + React
+import { Pricing } from "@/components/Pricing";
+
+function PricingPage() {
+  return (
+    <div className="app">
+      <Pricing />
+    </div>
+  );
+}
+
+export default PricingPage;
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Custom Tiers" icon="layer-group" href="/examples/custom-tiers">
+    Learn how to create custom pricing tiers for different use cases
+  </Card>
+  <Card title="Theming" icon="palette" href="/examples/theming">
+    Customize colors, dark mode, and styling
+  </Card>
+  <Card title="Pricing Component" icon="code" href="/components/pricing">
+    Complete component documentation
+  </Card>
+  <Card title="Configuration" icon="puzzle-piece" href="/configuration/tiers">
+    Configure pricing tiers
+  </Card>
+</CardGroup>

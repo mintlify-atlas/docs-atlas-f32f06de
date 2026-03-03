@@ -1,0 +1,355 @@
+---
+title: Payment Frequencies
+description: Configure billing cycles and payment frequency options
+---
+
+## Overview
+
+The `PAYMENT_FREQUENCIES` array defines the available billing cycles for your pricing tiers. Users can toggle between these frequencies to see different pricing options.
+
+## Configuration
+
+Define payment frequencies in `config/index.ts`:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+```
+
+### Default Setup
+
+The default configuration includes two standard billing cycles:
+
+- **monthly**: Monthly billing
+- **yearly**: Annual billing (typically discounted)
+
+These values must match the keys in each tier's `price` object.
+
+## How It Works
+
+The payment frequencies work in conjunction with the tier pricing:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,  // Shown when "monthly" is selected
+      yearly: 24,   // Shown when "yearly" is selected
+    },
+    // ... other fields
+  },
+];
+```
+
+When users toggle between frequencies, the pricing component displays the corresponding price from each tier's `price` object.
+
+## Customization Examples
+
+### Lifetime Pricing Option
+
+Add a one-time payment option:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly", "lifetime"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,
+      yearly: 24,
+      lifetime: 499,  // One-time payment
+    },
+    description: "For professional developers",
+    features: ["Unlimited projects", "Priority support"],
+    cta: "Get started",
+  },
+];
+```
+
+### Quarterly Billing
+
+Add quarterly payment cycles:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "quarterly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "business",
+    name: "Business",
+    price: {
+      monthly: 99,
+      quarterly: 89,   // 10% discount
+      yearly: 79,      // 20% discount
+    },
+    description: "For growing teams",
+    features: ["Advanced features", "Team collaboration"],
+    cta: "Start trial",
+  },
+];
+```
+
+### Single Frequency (No Toggle)
+
+If you only offer one billing cycle:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "standard",
+    name: "Standard",
+    price: {
+      monthly: 49,  // Only option
+    },
+    description: "Simple monthly billing",
+    features: ["All features included"],
+    cta: "Subscribe",
+  },
+];
+```
+
+<Note>
+With a single frequency, the toggle will not be displayed in the UI.
+</Note>
+
+### Custom Frequency Labels
+
+While the keys are used internally, you can customize the display labels by modifying the pricing component. The default implementation capitalizes the frequency names automatically:
+
+- `monthly` → "Monthly"
+- `yearly` → "Yearly"
+- `lifetime` → "Lifetime"
+
+## Pricing Strategy Patterns
+
+### Annual Discount Model
+
+Encourage annual subscriptions with significant savings:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 50,
+      yearly: 40,  // 20% savings (equivalent to $480/year vs $600)
+    },
+    description: "Save 20% with annual billing",
+    features: ["Premium features", "Priority support"],
+    cta: "Get started",
+  },
+];
+```
+
+### Tiered Annual Savings
+
+Offer different discount rates per tier:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: {
+      monthly: 19,
+      yearly: 17,  // ~11% savings
+    },
+    description: "Basic features",
+    features: ["Essential tools"],
+    cta: "Get started",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 49,
+      yearly: 39,  // ~20% savings
+    },
+    description: "Advanced features",
+    features: ["Everything in Starter", "Premium tools"],
+    cta: "Get started",
+    popular: true,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: 199,
+      yearly: 149,  // ~25% savings
+    },
+    description: "Enterprise features",
+    features: ["Everything in Pro", "Dedicated support"],
+    cta: "Get started",
+  },
+];
+```
+
+### Mixed Pricing (Numbers and Strings)
+
+Combine numeric prices with custom text:
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: {
+      monthly: "$0",
+      yearly: "$0",
+    },
+    description: "Always free",
+    features: ["Basic features"],
+    cta: "Get started",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,
+      yearly: 24,
+    },
+    description: "For professionals",
+    features: ["Advanced features"],
+    cta: "Start trial",
+    popular: true,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: "Custom",
+      yearly: "Custom",
+    },
+    description: "For large teams",
+    features: ["Enterprise features"],
+    cta: "Contact sales",
+  },
+];
+```
+
+## Price Display Logic
+
+The pricing component automatically handles different price types:
+
+### Numeric Prices
+
+When the price is a number, it's formatted as currency:
+
+```typescript
+price: {
+  monthly: 29,  // Displays as "$29" with "Per month/user" label
+}
+```
+
+### String Prices
+
+When the price is a string, it's displayed as-is without currency formatting:
+
+```typescript
+price: {
+  monthly: "Free",     // Displays exactly as "Free"
+  yearly: "Custom",    // Displays exactly as "Custom"
+}
+```
+
+This is defined in `components/PricingCard.tsx`:
+
+```tsx components/PricingCard.tsx
+{typeof price === "number" ? (
+  <>
+    <NumberFlow
+      format={{
+        style: "currency",
+        currency: "USD",
+        trailingZeroDisplay: "stripIfInteger",
+      }}
+      value={price}
+      className="text-4xl font-medium"
+    />
+    <p className="-mt-2 text-xs font-medium">Per month/user</p>
+  </>
+) : (
+  <h1 className="text-4xl font-medium">{price}</h1>
+)}
+```
+
+## Validation
+
+<Warning>
+Ensure every tier's `price` object contains all frequencies defined in `PAYMENT_FREQUENCIES`. Missing keys will cause runtime errors.
+</Warning>
+
+### Valid Configuration
+
+```typescript
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,  // ✓ Both frequencies defined
+      yearly: 24,
+    },
+    // ...
+  },
+];
+```
+
+### Invalid Configuration
+
+```typescript
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,  // ✗ Missing "yearly" key
+    },
+    // ...
+  },
+];
+```
+
+## TypeScript Type Safety
+
+The `PricingTier` interface uses a flexible `Record` type for prices:
+
+```typescript config/index.ts
+export interface PricingTier {
+  price: Record<string, number | string>;
+  // ... other fields
+}
+```
+
+This allows:
+- Any string key (matching your payment frequencies)
+- Values as either numbers (for currency formatting) or strings (for custom text)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Pricing Tiers" icon="layer-group" href="/configuration/tiers">
+    Configure your pricing plans and features
+  </Card>
+  <Card title="Styling" icon="palette" href="/configuration/styling">
+    Customize the appearance of your pricing page
+  </Card>
+</CardGroup>

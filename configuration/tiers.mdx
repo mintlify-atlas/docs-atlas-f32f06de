@@ -1,0 +1,372 @@
+---
+title: Pricing Tiers
+description: Configure pricing tiers with custom plans, features, and pricing models
+---
+
+## Overview
+
+The `TIERS` configuration array defines all pricing plans displayed in your pricing page. Each tier is defined using the `PricingTier` interface and supports flexible pricing models, feature lists, and visual customization.
+
+## PricingTier Interface
+
+The `PricingTier` interface defines the structure for each pricing tier:
+
+```typescript config/index.ts
+export interface PricingTier {
+  name: string;
+  id: string;
+  price: Record<string, number | string>;
+  description: string;
+  features: string[];
+  cta: string;
+  highlighted?: boolean;
+  popular?: boolean;
+}
+```
+
+### Field Definitions
+
+<ResponseField name="name" type="string" required>
+  The display name of the pricing tier (e.g., "Teams", "Enterprise").
+</ResponseField>
+
+<ResponseField name="id" type="string" required>
+  A unique identifier for the tier, used for tracking and analytics. Use lowercase with hyphens (e.g., "teams", "enterprise").
+</ResponseField>
+
+<ResponseField name="price" type="Record<string, number | string>" required>
+  An object mapping payment frequencies to prices. Keys should match your `PAYMENT_FREQUENCIES` array. Values can be:
+  - **Number**: Numeric price (e.g., `90` for $90)
+  - **String**: Custom text (e.g., `"Free"`, `"Custom"`, `"Contact Us"`)
+  
+  Example:
+  ```typescript
+  price: {
+    monthly: 90,
+    yearly: 75
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="description" type="string" required>
+  A brief description of the tier, displayed below the tier name (e.g., "Great for small businesses").
+</ResponseField>
+
+<ResponseField name="features" type="string[]" required>
+  An array of feature strings displayed as a checklist. Each feature is shown with a checkmark icon.
+  
+  Example:
+  ```typescript
+  features: [
+    "Unlimited phone calls",
+    "30 second checks",
+    "Up to 6 seats"
+  ]
+  ```
+</ResponseField>
+
+<ResponseField name="cta" type="string" required>
+  The call-to-action button text (e.g., "Get started", "Contact Us").
+</ResponseField>
+
+<ResponseField name="highlighted" type="boolean" default="false">
+  When `true`, the tier card is displayed with inverted colors (dark background) and a decorative grid pattern. Typically used for premium or recommended plans.
+</ResponseField>
+
+<ResponseField name="popular" type="boolean" default="false">
+  When `true`, displays a "Most Popular" badge and adds a purple outline to the card. The card also features a subtle radial gradient background.
+</ResponseField>
+
+## Default Configuration
+
+Here's the default `TIERS` array from `config/index.ts`:
+
+```typescript config/index.ts
+export const TIERS: PricingTier[] = [
+  {
+    id: "individuals",
+    name: "Individuals",
+    price: {
+      monthly: "Free",
+      yearly: "Free",
+    },
+    description: "For your hobby projects",
+    features: [
+      "Free email alerts",
+      "3-minute checks",
+      "Automatic data enrichment",
+      "10 monitors",
+      "Up to 3 seats",
+    ],
+    cta: "Get started",
+  },
+  {
+    id: "teams",
+    name: "Teams",
+    price: {
+      monthly: 90,
+      yearly: 75,
+    },
+    description: "Great for small businesses",
+    features: [
+      "Unlimited phone calls",
+      "30 second checks",
+      "Single-user account",
+      "20 monitors",
+      "Up to 6 seats",
+    ],
+    cta: "Get started",
+    popular: true,
+  },
+  {
+    id: "organizations",
+    name: "Organizations",
+    price: {
+      monthly: 120,
+      yearly: 100,
+    },
+    description: "Great for large businesses",
+    features: [
+      "Unlimited phone calls",
+      "15 second checks",
+      "Single-user account",
+      "50 monitors",
+      "Up to 10 seats",
+    ],
+    cta: "Get started",
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: "Custom",
+      yearly: "Custom",
+    },
+    description: "For multiple teams",
+    features: [
+      "Everything in Organizations",
+      "Up to 5 team members",
+      "100 monitors",
+      "15 status pages",
+      "200+ integrations",
+    ],
+    cta: "Contact Us",
+    highlighted: true,
+  },
+];
+```
+
+## Customization Examples
+
+### Simple Three-Tier Pricing
+
+```typescript config/index.ts
+export const TIERS: PricingTier[] = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: {
+      monthly: 0,
+      yearly: 0,
+    },
+    description: "Perfect for trying out",
+    features: [
+      "Up to 100 requests/month",
+      "Community support",
+      "Basic analytics",
+    ],
+    cta: "Start for free",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,
+      yearly: 24,
+    },
+    description: "For professional developers",
+    features: [
+      "Unlimited requests",
+      "Priority support",
+      "Advanced analytics",
+      "Custom webhooks",
+    ],
+    cta: "Start trial",
+    popular: true,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: "Custom",
+      yearly: "Custom",
+    },
+    description: "For large organizations",
+    features: [
+      "Everything in Pro",
+      "Dedicated support",
+      "SLA guarantee",
+      "Custom integrations",
+    ],
+    cta: "Contact sales",
+    highlighted: true,
+  },
+];
+```
+
+### Usage-Based Pricing with Multiple Frequencies
+
+```typescript config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly", "lifetime"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "basic",
+    name: "Basic",
+    price: {
+      monthly: 19,
+      yearly: 15,
+      lifetime: 299,
+    },
+    description: "Essential features",
+    features: [
+      "5 projects",
+      "10GB storage",
+      "Email support",
+    ],
+    cta: "Get started",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 49,
+      yearly: 39,
+      lifetime: 799,
+    },
+    description: "Advanced features",
+    features: [
+      "Unlimited projects",
+      "100GB storage",
+      "Priority support",
+      "Advanced analytics",
+    ],
+    cta: "Get started",
+    popular: true,
+  },
+];
+```
+
+### Free Plan with Contact-Only Enterprise
+
+```typescript config/index.ts
+export const TIERS: PricingTier[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: {
+      monthly: "$0",
+      yearly: "$0",
+    },
+    description: "Always free",
+    features: [
+      "1 workspace",
+      "3 team members",
+      "Community support",
+    ],
+    cta: "Get started",
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: "Let's talk",
+      yearly: "Let's talk",
+    },
+    description: "Custom solution",
+    features: [
+      "Unlimited workspaces",
+      "Unlimited members",
+      "Dedicated support",
+      "Custom SLA",
+    ],
+    cta: "Schedule demo",
+    highlighted: true,
+  },
+];
+```
+
+## Visual Flags
+
+### Highlighted Flag
+
+The `highlighted` flag transforms a tier card visually:
+
+- Inverted color scheme (dark background, light text)
+- Decorative grid pattern overlay
+- Used to emphasize premium or recommended plans
+
+```typescript
+{
+  id: "premium",
+  name: "Premium",
+  highlighted: true,  // Applies dark theme to this card
+  // ... other fields
+}
+```
+
+### Popular Flag
+
+The `popular` flag adds visual indicators:
+
+- "🔥 Most Popular" badge in the header
+- Purple outline around the card
+- Radial gradient background effect
+
+```typescript
+{
+  id: "pro",
+  name: "Pro",
+  popular: true,  // Shows "Most Popular" badge
+  // ... other fields
+}
+```
+
+<Note>
+You can combine both `highlighted` and `popular` flags on the same tier, though this is uncommon in practice.
+</Note>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Keep tier count reasonable">
+    Limit tiers to 3-4 options. Too many choices can overwhelm users and reduce conversions.
+  </Accordion>
+  
+  <Accordion title="Use consistent feature formatting">
+    Start features with action verbs or quantities. Keep descriptions concise and scannable.
+  </Accordion>
+  
+  <Accordion title="Price ordering matters">
+    Define tiers in ascending price order (free → basic → premium → enterprise) for better UX.
+  </Accordion>
+  
+  <Accordion title="Strategic use of flags">
+    Use `popular` for your most common choice and `highlighted` for your highest-value offer.
+  </Accordion>
+  
+  <Accordion title="Clear CTAs">
+    Use specific call-to-action text. "Get started" for self-service, "Contact sales" for enterprise.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Payment Frequencies" icon="calendar" href="/configuration/payment-frequencies">
+    Configure monthly, yearly, and custom billing cycles
+  </Card>
+  <Card title="Styling" icon="palette" href="/configuration/styling">
+    Customize colors, borders, and animations
+  </Card>
+</CardGroup>

@@ -1,0 +1,207 @@
+---
+title: PricingCard
+description: An individual pricing tier card with dynamic pricing, features list, and visual variants.
+---
+
+The `PricingCard` component displays a single pricing tier with its price, features, and call-to-action button. It supports highlighted and popular variants with special styling.
+
+## Props
+
+<ParamField path="tier" type="Tier" required>
+  The tier configuration object containing:
+  - `name`: Tier name (e.g., "starter", "pro")
+  - `price`: Object mapping payment frequencies to prices
+  - `description`: Short description of the tier
+  - `features`: Array of feature strings
+  - `cta`: Call-to-action button text
+  - `highlighted`: Boolean for highlighted styling
+  - `popular`: Boolean to show popular badge
+</ParamField>
+
+<ParamField path="paymentFrequency" type="string" required>
+  The selected payment frequency (e.g., "monthly", "yearly") used to display the correct price from the tier's price object.
+</ParamField>
+
+## Usage
+
+<Tabs>
+  <Tab title="Basic">
+    ```tsx
+    import { PricingCard } from "@/components/PricingCard";
+
+    const tier = {
+      name: "Pro",
+      price: { monthly: 29, yearly: 290 },
+      description: "For growing teams",
+      features: [
+        "Unlimited projects",
+        "Advanced analytics",
+        "Priority support"
+      ],
+      cta: "Get Started",
+      highlighted: false,
+      popular: false
+    };
+
+    <PricingCard tier={tier} paymentFrequency="monthly" />
+    ```
+  </Tab>
+  
+  <Tab title="Highlighted">
+    ```tsx
+    const highlightedTier = {
+      name: "Enterprise",
+      price: { monthly: 99, yearly: 990 },
+      description: "For large organizations",
+      features: [
+        "Everything in Pro",
+        "Dedicated support",
+        "Custom integrations"
+      ],
+      cta: "Contact Sales",
+      highlighted: true,
+      popular: false
+    };
+
+    <PricingCard tier={highlightedTier} paymentFrequency="yearly" />
+    ```
+  </Tab>
+  
+  <Tab title="Popular">
+    ```tsx
+    const popularTier = {
+      name: "Pro",
+      price: { monthly: 29, yearly: 290 },
+      description: "Most popular choice",
+      features: [
+        "Unlimited projects",
+        "Advanced analytics",
+        "Priority support"
+      ],
+      cta: "Get Started",
+      highlighted: false,
+      popular: true
+    };
+
+    <PricingCard tier={popularTier} paymentFrequency="monthly" />
+    ```
+  </Tab>
+  
+  <Tab title="Custom Price">
+    ```tsx
+    const customTier = {
+      name: "Custom",
+      price: { monthly: "Custom", yearly: "Custom" },
+      description: "Tailored to your needs",
+      features: [
+        "Everything included",
+        "Custom features",
+        "White-label option"
+      ],
+      cta: "Contact Us",
+      highlighted: false,
+      popular: false
+    };
+
+    <PricingCard tier={customTier} paymentFrequency="monthly" />
+    ```
+  </Tab>
+</Tabs>
+
+## Visual Variants
+
+### Highlighted Card
+
+When `tier.highlighted` is `true`:
+- Inverted colors (foreground background, background text)
+- Grid pattern background decoration
+- Accent-colored CTA button
+
+### Popular Card
+
+When `tier.popular` is `true`:
+- Orange "🔥 Most Popular" badge in header
+- Radial gradient background decoration
+- Purple outline around the card
+
+## Card Structure
+
+The card is organized into these sections:
+
+1. **Background Decorations**: Grid or radial gradient (conditional)
+2. **Header**: Tier name with optional popular badge
+3. **Price Section**: Animated price with NumberFlow or custom text
+4. **Features List**: Checkmark icons with feature text
+5. **CTA Button**: Expand icon button with tier-specific text
+
+## Price Display
+
+The component intelligently handles different price types:
+
+```tsx
+{typeof price === "number" ? (
+  <>
+    <NumberFlow
+      format={{
+        style: "currency",
+        currency: "USD",
+        trailingZeroDisplay: "stripIfInteger",
+      }}
+      value={price}
+      className="text-4xl font-medium"
+    />
+    <p className="-mt-2 text-xs font-medium">Per month/user</p>
+  </>
+) : (
+  <h1 className="text-4xl font-medium">{price}</h1>
+)}
+```
+
+- **Numeric prices**: Formatted as USD currency with NumberFlow animation
+- **String prices**: Displayed as plain text (e.g., "Custom")
+
+## Features List
+
+Each feature is rendered with:
+- `BadgeCheck` icon (16px, stroke width 1)
+- Feature text with adjusted opacity based on highlighted state
+
+```tsx
+<ul className="space-y-2">
+  {tier.features.map((feature, index) => (
+    <li
+      key={index}
+      className="flex items-center gap-2 text-sm font-medium"
+    >
+      <BadgeCheck strokeWidth={1} size={16} />
+      {feature}
+    </li>
+  ))}
+</ul>
+```
+
+## Styling
+
+The card uses dynamic styling based on variant:
+
+```tsx
+className={cn(
+  "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+  isHighlighted
+    ? "bg-foreground text-background"
+    : "bg-background text-foreground",
+  isPopular && "outline outline-[rgba(120,119,198)]",
+)}
+```
+
+## Dependencies
+
+- `@number-flow/react` - Animated number transitions
+- `lucide-react` - Icons (ArrowRight, BadgeCheck)
+- `@/ui/badge` - Badge component
+- `@/ui/button` - Button component
+- `@/lib/utils` - cn utility for className merging
+
+## Source Code
+
+View the complete source code at `components/PricingCard.tsx`

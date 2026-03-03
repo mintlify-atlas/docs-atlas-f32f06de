@@ -1,0 +1,202 @@
+---
+title: PricingHeader
+description: A header component for the pricing section with title, subtitle, and payment frequency tabs.
+---
+
+The `PricingHeader` component displays the title and subtitle for the pricing section, along with a tab selector for choosing between different payment frequencies (e.g., monthly/yearly).
+
+## Props
+
+<ParamField path="title" type="string" required>
+  The main heading text displayed at the top of the pricing section.
+</ParamField>
+
+<ParamField path="subtitle" type="string" required>
+  The descriptive text displayed below the title, typically explaining the pricing offer or benefits.
+</ParamField>
+
+<ParamField path="frequencies" type="string[]" required>
+  Array of available payment frequency options (e.g., `["monthly", "yearly"]`).
+</ParamField>
+
+<ParamField path="selectedFrequency" type="string" required>
+  The currently selected payment frequency.
+</ParamField>
+
+<ParamField path="onFrequencyChange" type="(frequency: string) => void" required>
+  Callback function invoked when the user selects a different payment frequency. Receives the selected frequency string as an argument.
+</ParamField>
+
+## Usage
+
+<Tabs>
+  <Tab title="Basic">
+    ```tsx
+    import { PricingHeader } from "@/components/PricingHeader";
+    import { useState } from "react";
+
+    export default function PricingSection() {
+      const [selectedFreq, setSelectedFreq] = useState("monthly");
+
+      return (
+        <PricingHeader
+          title="Plans and Pricing"
+          subtitle="Choose the perfect plan for your needs."
+          frequencies={["monthly", "yearly"]}
+          selectedFrequency={selectedFreq}
+          onFrequencyChange={setSelectedFreq}
+        />
+      );
+    }
+    ```
+  </Tab>
+  
+  <Tab title="With Discount">
+    ```tsx
+    import { PricingHeader } from "@/components/PricingHeader";
+    import { useState } from "react";
+
+    export default function PricingSection() {
+      const [selectedFreq, setSelectedFreq] = useState("monthly");
+
+      return (
+        <PricingHeader
+          title="Plans and Pricing"
+          subtitle="Receive unlimited credits when you pay yearly, and save on your plan."
+          frequencies={["monthly", "yearly"]}
+          selectedFrequency={selectedFreq}
+          onFrequencyChange={setSelectedFreq}
+        />
+      );
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Custom Frequencies">
+    ```tsx
+    import { PricingHeader } from "@/components/PricingHeader";
+    import { useState } from "react";
+
+    export default function PricingSection() {
+      const [selectedFreq, setSelectedFreq] = useState("monthly");
+
+      return (
+        <PricingHeader
+          title="Flexible Pricing Options"
+          subtitle="Select the billing cycle that works best for you."
+          frequencies={["monthly", "quarterly", "yearly"]}
+          selectedFrequency={selectedFreq}
+          onFrequencyChange={setSelectedFreq}
+        />
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Component Structure
+
+The component consists of two main sections:
+
+1. **Text Section**: Title and subtitle
+2. **Frequency Selector**: Tab component for switching payment frequencies
+
+```tsx
+<div className="space-y-7 text-center">
+  <div className="space-y-4">
+    <h1 className="text-4xl font-medium md:text-5xl">{title}</h1>
+    <p>{subtitle}</p>
+  </div>
+  <div className="mx-auto flex w-fit rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+    {frequencies.map((freq) => (
+      <Tab
+        key={freq}
+        text={freq}
+        selected={selectedFrequency === freq}
+        setSelected={onFrequencyChange}
+        discount={freq === "yearly"}
+      />
+    ))}
+  </div>
+</div>
+```
+
+## Frequency Tabs
+
+The frequency selector:
+- Renders a `Tab` component for each frequency option
+- Displays in a rounded pill-shaped container
+- Uses light/dark mode styling (`#F3F4F6` light, `#222` dark)
+- Shows discount badge on "yearly" frequency
+- Centers horizontally with `mx-auto w-fit`
+
+## Discount Badge
+
+The component automatically shows a discount badge on the "yearly" frequency:
+
+```tsx
+discount={freq === "yearly"}
+```
+
+This is hardcoded in the component and displays a "Save 35%" badge when the yearly option is shown.
+
+## Responsive Typography
+
+The title scales responsively:
+- Mobile: `text-4xl` (2.25rem / 36px)
+- Desktop (md+): `text-5xl` (3rem / 48px)
+
+## Styling
+
+- **Layout**: Centered text with vertical spacing
+- **Title**: Large, medium weight font
+- **Subtitle**: Default paragraph styling
+- **Tab Container**: Rounded full, with padding and background color
+- **Dark Mode**: Automatic dark mode support via Tailwind's dark variant
+
+## Integration Example
+
+Typical usage within a pricing section:
+
+```tsx
+import { PricingHeader } from "@/components/PricingHeader";
+import { PricingCard } from "@/components/PricingCard";
+import { useState } from "react";
+import { PAYMENT_FREQUENCIES, TIERS } from "@/config";
+
+export default function Pricing() {
+  const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+    PAYMENT_FREQUENCIES[0],
+  );
+
+  return (
+    <section className="flex flex-col items-center gap-10 py-10">
+      <PricingHeader
+        title="Plans and Pricing"
+        subtitle="Receive unlimited credits when you pay yearly, and save on your plan."
+        frequencies={PAYMENT_FREQUENCIES}
+        selectedFrequency={selectedPaymentFreq}
+        onFrequencyChange={setSelectedPaymentFreq}
+      />
+      
+      <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {TIERS.map((tier, i) => (
+          <PricingCard
+            key={i}
+            tier={tier}
+            paymentFrequency={selectedPaymentFreq}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+## Dependencies
+
+- `@/ui/tab` - Tab component for frequency selection
+
+## Source Code
+
+View the complete source code at `components/PricingHeader.tsx`

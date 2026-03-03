@@ -1,0 +1,298 @@
+---
+title: Installation
+description: Complete guide to installing and configuring shadcn-pricing-page in your Next.js project.
+---
+
+## Prerequisites
+
+Before installing, ensure you have:
+
+- **Node.js 18+** installed on your system
+- A **Next.js 15+** project with **App Router** enabled
+- **React 19+** installed
+- **Tailwind CSS** configured in your project
+
+<Note>
+  This guide assumes you have an existing Next.js project. If you're starting from scratch, create a new Next.js app first:
+  ```bash
+  npx create-next-app@latest my-app
+  ```
+</Note>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Install Dependencies">
+    Install all required packages for the pricing component:
+
+    <CodeGroup>
+      ```bash npm
+      npm install @number-flow/react motion next-themes lucide-react
+      npm install @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip
+      npm install class-variance-authority clsx tailwind-merge tailwindcss-animate
+      ```
+
+      ```bash yarn
+      yarn add @number-flow/react motion next-themes lucide-react
+      yarn add @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip
+      yarn add class-variance-authority clsx tailwind-merge tailwindcss-animate
+      ```
+
+      ```bash pnpm
+      pnpm add @number-flow/react motion next-themes lucide-react
+      pnpm add @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip
+      pnpm add class-variance-authority clsx tailwind-merge tailwindcss-animate
+      ```
+    </CodeGroup>
+
+    <Tip>
+      **Key dependencies explained:**
+      - `@number-flow/react` - Animated number transitions for prices
+      - `motion` - Animation library (Framer Motion)
+      - `next-themes` - Theme switching support
+      - `lucide-react` - Icon library
+      - Radix UI packages - Accessible component primitives
+    </Tip>
+  </Step>
+
+  <Step title="Configure Tailwind CSS">
+    Update your `tailwind.config.ts` to include the necessary configuration:
+
+    ```typescript tailwind.config.ts
+    import type { Config } from "tailwindcss";
+
+    export default {
+      darkMode: ["class"],
+      content: [
+        "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+        "./components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./app/**/*.{js,ts,jsx,tsx,mdx}",
+      ],
+      theme: {
+        extend: {
+          colors: {
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            card: {
+              DEFAULT: "hsl(var(--card))",
+              foreground: "hsl(var(--card-foreground))",
+            },
+            popover: {
+              DEFAULT: "hsl(var(--popover))",
+              foreground: "hsl(var(--popover-foreground))",
+            },
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            secondary: {
+              DEFAULT: "hsl(var(--secondary))",
+              foreground: "hsl(var(--secondary-foreground))",
+            },
+            muted: {
+              DEFAULT: "hsl(var(--muted))",
+              foreground: "hsl(var(--muted-foreground))",
+            },
+            accent: {
+              DEFAULT: "hsl(var(--accent))",
+              foreground: "hsl(var(--accent-foreground))",
+            },
+            destructive: {
+              DEFAULT: "hsl(var(--destructive))",
+              foreground: "hsl(var(--destructive-foreground))",
+            },
+            border: "hsl(var(--border))",
+            input: "hsl(var(--input))",
+            ring: "hsl(var(--ring))",
+          },
+          borderRadius: {
+            lg: "var(--radius)",
+            md: "calc(var(--radius) - 2px)",
+            sm: "calc(var(--radius) - 4px)",
+          },
+          keyframes: {
+            shine: {
+              from: { backgroundPosition: "200% 0" },
+              to: { backgroundPosition: "-200% 0" },
+            },
+          },
+          animation: {
+            shine: "shine 8s ease-in-out infinite",
+          },
+        },
+      },
+      plugins: [require("tailwindcss-animate")],
+    } satisfies Config;
+    ```
+  </Step>
+
+  <Step title="Add CSS Variables">
+    Add the following CSS variables to your `app/globals.css`:
+
+    ```css app/globals.css
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --ring: 240 10% 3.9%;
+        --radius: 0.75rem;
+      }
+
+      .dark {
+        --background: 0 0% 7%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
+      }
+    }
+
+    @layer base {
+      * {
+        @apply border-border;
+      }
+      body {
+        @apply bg-background text-foreground;
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Create Utility Functions">
+    Create a `lib/utils.ts` file for the `cn` utility function:
+
+    ```typescript lib/utils.ts
+    import { clsx, type ClassValue } from "clsx";
+    import { twMerge } from "tailwind-merge";
+
+    export function cn(...inputs: ClassValue[]) {
+      return twMerge(clsx(inputs));
+    }
+    ```
+
+    This utility combines Tailwind classes intelligently, preventing conflicts.
+  </Step>
+
+  <Step title="Configure Path Aliases">
+    Update your `tsconfig.json` to include path aliases:
+
+    ```json tsconfig.json
+    {
+      "compilerOptions": {
+        "paths": {
+          "@/*": ["./*"],
+          "@/components/*": ["./components/*"],
+          "@/lib/*": ["./lib/*"],
+          "@/ui/*": ["./components/ui/*"],
+          "@/config/*": ["./config/*"]
+        }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Set Up Theme Provider">
+    Wrap your app with the `ThemeProvider` in your root layout:
+
+    ```tsx app/layout.tsx
+    import { ThemeProvider } from "next-themes";
+    import "./globals.css";
+
+    export default function RootLayout({
+      children,
+    }: {
+      children: React.ReactNode;
+    }) {
+      return (
+        <html lang="en" suppressHydrationWarning>
+          <body>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+
+    <Note>
+      The `suppressHydrationWarning` prop is important to prevent hydration warnings when using theme switching.
+    </Note>
+  </Step>
+</Steps>
+
+## Verification
+
+Verify your installation by checking:
+
+<CodeGroup>
+  ```bash Check installed packages
+  npm list @number-flow/react motion next-themes
+  ```
+
+  ```bash Run development server
+  npm run dev
+  ```
+</CodeGroup>
+
+You should see no errors in the console. If you encounter issues:
+
+- Ensure all peer dependencies are satisfied
+- Clear your `.next` cache: `rm -rf .next`
+- Restart your development server
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Create your first pricing component
+  </Card>
+  <Card title="Components" icon="cube" href="/components/pricing">
+    Explore available components
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Pro tip:** If you're using shadcn/ui CLI, you can install UI components individually:
+  ```bash
+  npx shadcn@latest add button badge separator
+  ```
+</Tip>

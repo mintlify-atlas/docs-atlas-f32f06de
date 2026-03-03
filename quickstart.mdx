@@ -1,80 +1,475 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Build your first pricing component in minutes with this step-by-step tutorial.
 ---
 
-## Get started in three steps
+## Overview
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+This guide will walk you through creating a fully functional pricing page with animated transitions, frequency toggles, and multiple pricing tiers.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Make sure you've completed the [installation](/installation) steps before proceeding.
 </Note>
+
+## Quick Tutorial
+
+<Steps>
+  <Step title="Create Pricing Configuration">
+    First, create a configuration file to define your pricing tiers. Create `config/index.ts`:
+
+    ```typescript config/index.ts
+    export const PAYMENT_FREQUENCIES = ["monthly", "yearly"];
+
+    export interface PricingTier {
+      name: string;
+      id: string;
+      price: Record<string, number | string>;
+      description: string;
+      features: string[];
+      cta: string;
+      highlighted?: boolean;
+      popular?: boolean;
+    }
+
+    export const TIERS: PricingTier[] = [
+      {
+        id: "individuals",
+        name: "Individuals",
+        price: {
+          monthly: "Free",
+          yearly: "Free",
+        },
+        description: "For your hobby projects",
+        features: [
+          "Free email alerts",
+          "3-minute checks",
+          "Automatic data enrichment",
+          "10 monitors",
+          "Up to 3 seats",
+        ],
+        cta: "Get started",
+      },
+      {
+        id: "teams",
+        name: "Teams",
+        price: {
+          monthly: 90,
+          yearly: 75,
+        },
+        description: "Great for small businesses",
+        features: [
+          "Unlimited phone calls",
+          "30 second checks",
+          "Single-user account",
+          "20 monitors",
+          "Up to 6 seats",
+        ],
+        cta: "Get started",
+        popular: true, // Adds "Most Popular" badge
+      },
+      {
+        id: "organizations",
+        name: "Organizations",
+        price: {
+          monthly: 120,
+          yearly: 100,
+        },
+        description: "Great for large businesses",
+        features: [
+          "Unlimited phone calls",
+          "15 second checks",
+          "Single-user account",
+          "50 monitors",
+          "Up to 10 seats",
+        ],
+        cta: "Get started",
+      },
+      {
+        id: "enterprise",
+        name: "Enterprise",
+        price: {
+          monthly: "Custom",
+          yearly: "Custom",
+        },
+        description: "For multiple teams",
+        features: [
+          "Everything in Organizations",
+          "Up to 5 team members",
+          "100 monitors",
+          "15 status pages",
+          "200+ integrations",
+        ],
+        cta: "Contact Us",
+        highlighted: true, // Inverts colors for emphasis
+      },
+    ];
+    ```
+
+    <Tip>
+      You can mix string and number prices. Use numbers for animated transitions and strings for custom pricing like "Free" or "Custom".
+    </Tip>
+  </Step>
+
+  <Step title="Create the Tab Component">
+    Create the frequency toggle component at `components/ui/tab.tsx`:
+
+    ```tsx components/ui/tab.tsx
+    import { cn } from "@/lib/utils";
+    import { motion } from "motion/react";
+    import { Badge } from "./badge";
+
+    interface TabProps {
+      text: string;
+      selected: boolean;
+      setSelected: (text: string) => void;
+      discount?: boolean;
+    }
+
+    export const Tab = ({
+      text,
+      selected,
+      setSelected,
+      discount = false,
+    }: TabProps) => {
+      return (
+        <button
+          onClick={() => setSelected(text)}
+          className={cn(
+            "relative w-fit px-4 py-2 text-sm font-semibold capitalize text-foreground transition-colors",
+            discount && "flex items-center justify-center gap-2.5",
+          )}
+        >
+          <span className="relative z-10">{text}</span>
+          {selected && (
+            <motion.span
+              layoutId="tab"
+              transition={{ type: "spring", duration: 0.4 }}
+              className="absolute inset-0 z-0 rounded-full bg-background shadow-sm"
+            ></motion.span>
+          )}
+          {discount && (
+            <Badge
+              className={cn(
+                "relative z-10 whitespace-nowrap bg-gray-100 text-xs text-black shadow-none hover:bg-gray-100",
+                selected
+                  ? "bg-[#F3F4F6] hover:bg-[#F3F4F6]"
+                  : "bg-gray-300 hover:bg-gray-300",
+              )}
+            >
+              Save 35%
+            </Badge>
+          )}
+        </button>
+      );
+    };
+    ```
+  </Step>
+
+  <Step title="Create the Pricing Header">
+    Create `components/PricingHeader.tsx` for the section header:
+
+    ```tsx components/PricingHeader.tsx
+    import { Tab } from "@/ui/tab";
+
+    export const PricingHeader = ({
+      title,
+      subtitle,
+      frequencies,
+      selectedFrequency,
+      onFrequencyChange,
+    }: {
+      title: string;
+      subtitle: string;
+      frequencies: string[];
+      selectedFrequency: string;
+      onFrequencyChange: (frequency: string) => void;
+    }) => (
+      <div className="space-y-7 text-center">
+        <div className="space-y-4">
+          <h1 className="text-4xl font-medium md:text-5xl">{title}</h1>
+          <p>{subtitle}</p>
+        </div>
+        <div className="mx-auto flex w-fit rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+          {frequencies.map((freq) => (
+            <Tab
+              key={freq}
+              text={freq}
+              selected={selectedFrequency === freq}
+              setSelected={onFrequencyChange}
+              discount={freq === "yearly"}
+            />
+          ))}
+        </div>
+      </div>
+    );
+    ```
+  </Step>
+
+  <Step title="Create the Pricing Card">
+    Create `components/PricingCard.tsx` for individual pricing tiers:
+
+    ```tsx components/PricingCard.tsx
+    import { TIERS } from "@/config";
+    import { cn } from "@/lib/utils";
+    import { Badge } from "@/ui/badge";
+    import { Button } from "@/ui/button";
+    import NumberFlow from "@number-flow/react";
+    import { ArrowRight, BadgeCheck } from "lucide-react";
+
+    export const PricingCard = ({
+      tier,
+      paymentFrequency,
+    }: {
+      tier: (typeof TIERS)[0];
+      paymentFrequency: string;
+    }) => {
+      const price = tier.price[paymentFrequency];
+      const isHighlighted = tier.highlighted;
+      const isPopular = tier.popular;
+
+      return (
+        <div
+          className={cn(
+            "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+            isHighlighted
+              ? "bg-foreground text-background"
+              : "bg-background text-foreground",
+            isPopular && "outline outline-[rgba(120,119,198)]",
+          )}
+        >
+          {/* Background Decoration */}
+          {isHighlighted && <HighlightedBackground />}
+          {isPopular && <PopularBackground />}
+
+          {/* Card Header */}
+          <h2 className="flex items-center gap-3 text-xl font-medium capitalize">
+            {tier.name}
+            {isPopular && (
+              <Badge className="mt-1 bg-orange-900 px-1 py-0 text-white hover:bg-orange-900">
+                Most Popular
+              </Badge>
+            )}
+          </h2>
+
+          {/* Price Section */}
+          <div className="relative h-12">
+            {typeof price === "number" ? (
+              <>
+                <NumberFlow
+                  format={{
+                    style: "currency",
+                    currency: "USD",
+                    trailingZeroDisplay: "stripIfInteger",
+                  }}
+                  value={price}
+                  className="text-4xl font-medium"
+                />
+                <p className="-mt-2 text-xs font-medium">Per month/user</p>
+              </>
+            ) : (
+              <h1 className="text-4xl font-medium">{price}</h1>
+            )}
+          </div>
+
+          {/* Features */}
+          <div className="flex-1 space-y-2">
+            <h3 className="text-sm font-medium">{tier.description}</h3>
+            <ul className="space-y-2">
+              {tier.features.map((feature, index) => (
+                <li
+                  key={index}
+                  className={cn(
+                    "flex items-center gap-2 text-sm font-medium",
+                    isHighlighted ? "text-background" : "text-foreground/60",
+                  )}
+                >
+                  <BadgeCheck strokeWidth={1} size={16} />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Call to Action Button */}
+          <Button
+            variant="expandIcon"
+            Icon={ArrowRight}
+            iconPlacement="right"
+            className={cn(
+              "h-fit w-full rounded-lg",
+              isHighlighted && "bg-accent text-foreground hover:bg-accent/95",
+            )}
+          >
+            {tier.cta}
+          </Button>
+        </div>
+      );
+    };
+
+    // Highlighted Background Component
+    const HighlightedBackground = () => (
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:45px_45px] opacity-100 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] dark:opacity-30" />
+    );
+
+    // Popular Background Component
+    const PopularBackground = () => (
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+    );
+    ```
+  </Step>
+
+  <Step title="Create the Main Pricing Component">
+    Create `components/Pricing.tsx` to bring it all together:
+
+    ```tsx components/Pricing.tsx
+    "use client";
+
+    import { PricingCard } from "@/components/PricingCard";
+    import { PricingHeader } from "@/components/PricingHeader";
+    import { PAYMENT_FREQUENCIES, TIERS } from "@/config";
+    import { useState } from "react";
+
+    export const Pricing = () => {
+      const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+        PAYMENT_FREQUENCIES[0],
+      );
+
+      return (
+        <section className="flex flex-col items-center gap-10 py-10">
+          {/* Section Header */}
+          <PricingHeader
+            title="Plans and Pricing"
+            subtitle="Receive unlimited credits when you pay yearly, and save on your plan."
+            frequencies={PAYMENT_FREQUENCIES}
+            selectedFrequency={selectedPaymentFreq}
+            onFrequencyChange={setSelectedPaymentFreq}
+          />
+
+          {/* Pricing Cards */}
+          <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {TIERS.map((tier, i) => (
+              <PricingCard
+                key={i}
+                tier={tier}
+                paymentFrequency={selectedPaymentFreq}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    };
+    ```
+  </Step>
+
+  <Step title="Add to Your Page">
+    Finally, use the component in your page:
+
+    ```tsx app/pricing/page.tsx
+    import { Pricing } from "@/components/Pricing";
+
+    export default function PricingPage() {
+      return <Pricing />;
+    }
+    ```
+  </Step>
+</Steps>
+
+## See It in Action
+
+Run your development server:
+
+```bash
+npm run dev
+```
+
+Navigate to `/pricing` to see your pricing component in action!
+
+## What You Built
+
+You now have a fully functional pricing component with:
+
+- **Animated price transitions** when switching between monthly and yearly
+- **4 pricing tiers** with customizable features
+- **Popular tier highlighting** with special styling
+- **Highlighted enterprise tier** with inverted colors
+- **Responsive grid layout** that adapts to all screen sizes
+- **Dark mode support** that works automatically
+- **Interactive frequency toggle** with smooth animations
+
+## Customization Tips
+
+<CardGroup cols={2}>
+  <Card title="Change Colors" icon="palette">
+    Modify the CSS variables in `globals.css` to match your brand
+  </Card>
+  <Card title="Add More Tiers" icon="plus">
+    Simply add more objects to the `TIERS` array in your config
+  </Card>
+  <Card title="Custom Features" icon="list">
+    Modify the `features` array for each tier in the configuration
+  </Card>
+  <Card title="Different Frequencies" icon="calendar">
+    Add quarterly or custom frequencies to `PAYMENT_FREQUENCIES`
+  </Card>
+</CardGroup>
+
+## Common Customizations
+
+### Change the Currency
+
+Modify the `NumberFlow` component's format prop:
+
+```tsx
+<NumberFlow
+  format={{
+    style: "currency",
+    currency: "EUR", // Change from USD to EUR
+    trailingZeroDisplay: "stripIfInteger",
+  }}
+  value={price}
+/>
+```
+
+### Adjust Grid Columns
+
+Change the responsive grid in `Pricing.tsx`:
+
+```tsx
+{/* 3 columns on desktop instead of 4 */}
+<div className="grid w-full max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-3">
+```
+
+### Add Click Handlers
+
+Add functionality to your CTA buttons:
+
+```tsx
+<Button
+  onClick={() => handleSubscribe(tier.id)}
+  variant="expandIcon"
+  Icon={ArrowRight}
+>
+  {tier.cta}
+</Button>
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Component Reference" icon="book" href="/components/pricing">
+    Explore all component props and options
+  </Card>
+  <Card title="Configuration Guide" icon="gear" href="/configuration/tiers">
+    Learn advanced configuration options
+  </Card>
+  <Card title="Styling" icon="paintbrush" href="/configuration/styling">
+    Customize the appearance
+  </Card>
+  <Card title="Examples" icon="code" href="/examples/basic-usage">
+    See more implementation examples
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Need help?** Check out the [GitHub repository](https://github.com/aymanch-03/shadcn-pricing-page) for more examples and community support.
+</Tip>

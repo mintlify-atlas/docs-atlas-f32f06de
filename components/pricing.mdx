@@ -1,0 +1,87 @@
+---
+title: Pricing
+description: A complete pricing section component that combines pricing cards with a header and payment frequency selection.
+---
+
+The `Pricing` component is the main wrapper component that orchestrates the entire pricing section. It manages the payment frequency state and renders both the header and pricing cards.
+
+## Usage
+
+```tsx
+import { Pricing } from "@/components/Pricing";
+
+export default function PricingPage() {
+  return <Pricing />;
+}
+```
+
+## Features
+
+- **State Management**: Handles payment frequency selection (monthly/yearly)
+- **Responsive Grid**: Automatically adjusts card layout based on screen size
+- **Integration**: Combines PricingHeader and PricingCard components
+- **Configuration-Driven**: Uses PAYMENT_FREQUENCIES and TIERS from config
+
+## Component Structure
+
+The component renders a flexbox container with:
+
+1. **PricingHeader**: Displays the title, subtitle, and frequency toggle
+2. **Pricing Cards Grid**: Responsive grid (2 columns on SM, 4 columns on XL)
+
+## Layout
+
+```tsx
+<section className="flex flex-col items-center gap-10 py-10">
+  <PricingHeader
+    title="Plans and Pricing"
+    subtitle="Receive unlimited credits when you pay yearly, and save on your plan."
+    frequencies={PAYMENT_FREQUENCIES}
+    selectedFrequency={selectedPaymentFreq}
+    onFrequencyChange={setSelectedPaymentFreq}
+  />
+  
+  <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    {TIERS.map((tier, i) => (
+      <PricingCard
+        key={i}
+        tier={tier}
+        paymentFrequency={selectedPaymentFreq}
+      />
+    ))}
+  </div>
+</section>
+```
+
+## State Management
+
+The component uses React's `useState` to manage the selected payment frequency:
+
+```tsx
+const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+  PAYMENT_FREQUENCIES[0],
+);
+```
+
+The state is:
+- Initialized with the first payment frequency from config
+- Passed to PricingHeader for display and updates
+- Passed to each PricingCard to display the correct price
+
+## Responsive Behavior
+
+- **Mobile**: Single column
+- **SM (640px+)**: 2 columns
+- **XL (1280px+)**: 4 columns
+- **Max Width**: Constrained to 1536px (6xl)
+
+## Dependencies
+
+- `PricingCard` component
+- `PricingHeader` component
+- `PAYMENT_FREQUENCIES` from config
+- `TIERS` from config
+
+## Source Code
+
+View the complete source code at `components/Pricing.tsx`

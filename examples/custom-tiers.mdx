@@ -1,0 +1,426 @@
+---
+title: 'Custom Tiers'
+description: 'Examples of creating and configuring custom pricing tiers for different use cases'
+---
+
+## Overview
+
+Pricing tiers are defined in your `config/index.ts` file. Each tier follows the `PricingTier` interface and can be customized to fit your business model.
+
+## Tier Structure
+
+Here's the complete TypeScript interface for a pricing tier:
+
+```tsx config/index.ts
+export interface PricingTier {
+  name: string;              // Display name of the tier
+  id: string;                // Unique identifier
+  price: Record<string, number | string>; // Prices for each frequency
+  description: string;       // Short description
+  features: string[];        // List of features
+  cta: string;              // Call-to-action button text
+  highlighted?: boolean;    // Show with highlighted styling
+  popular?: boolean;        // Show "Most Popular" badge
+}
+```
+
+## Example 1: Student/Education Tier
+
+Create a special tier for students with discounted pricing:
+
+<Steps>
+  <Step title="Define the Tier">
+    Add a student tier to your `TIERS` array:
+
+    ```tsx config/index.ts
+    export const TIERS: PricingTier[] = [
+      {
+        id: "student",
+        name: "Student",
+        price: {
+          monthly: 5,
+          yearly: 4,
+        },
+        description: "Perfect for students and educators",
+        features: [
+          "All Individual features",
+          "50% student discount",
+          "Educational resources",
+          "Valid .edu email required",
+          "5 projects",
+        ],
+        cta: "Verify Student Status",
+        popular: true,
+      },
+      // ... other tiers
+    ];
+    ```
+  </Step>
+
+  <Step title="Handle Special CTA">
+    If your student tier requires verification, update your click handler:
+
+    ```tsx components/PricingCard.tsx
+    <Button
+      variant="expandIcon"
+      Icon={ArrowRight}
+      iconPlacement="right"
+      onClick={() => {
+        if (tier.id === "student") {
+          // Redirect to student verification
+          window.location.href = "/verify-student";
+        } else {
+          // Normal checkout flow
+          handleCheckout(tier.id);
+        }
+      }}
+    >
+      {tier.cta}
+    </Button>
+    ```
+  </Step>
+</Steps>
+
+## Example 2: Enterprise/Custom Tier
+
+Create a tier with custom pricing and contact sales CTA:
+
+```tsx config/index.ts
+export const TIERS: PricingTier[] = [
+  // ... other tiers
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: {
+      monthly: "Custom",
+      yearly: "Custom",
+    },
+    description: "For large organizations",
+    features: [
+      "Everything in Pro",
+      "Unlimited team members",
+      "Advanced security & compliance",
+      "Dedicated account manager",
+      "Custom integrations",
+      "SLA guarantee",
+    ],
+    cta: "Contact Sales",
+    highlighted: true,
+  },
+];
+```
+
+<Tip>
+  Setting `highlighted: true` gives the tier a special dark background with a grid pattern overlay, making it stand out visually.
+</Tip>
+
+## Example 3: Freemium Model
+
+Create a robust free tier with clear limitations:
+
+```tsx config/index.ts
+export const TIERS: PricingTier[] = [
+  {
+    id: "free",
+    name: "Free Forever",
+    price: {
+      monthly: "Free",
+      yearly: "Free",
+    },
+    description: "Get started at no cost",
+    features: [
+      "3 projects",
+      "Basic analytics",
+      "Community support",
+      "1 team member",
+      "Core features only",
+    ],
+    cta: "Start Free",
+  },
+  {
+    id: "starter",
+    name: "Starter",
+    price: {
+      monthly: 19,
+      yearly: 15,
+    },
+    description: "For growing projects",
+    features: [
+      "Everything in Free",
+      "10 projects",
+      "Advanced analytics",
+      "Email support",
+      "Up to 3 team members",
+    ],
+    cta: "Start Trial",
+    popular: true,
+  },
+  // ... more tiers
+];
+```
+
+## Example 4: Usage-Based Tiers
+
+Create tiers based on usage limits:
+
+```tsx config/index.ts
+export const TIERS: PricingTier[] = [
+  {
+    id: "micro",
+    name: "Micro",
+    price: {
+      monthly: 9,
+      yearly: 7,
+    },
+    description: "For side projects",
+    features: [
+      "10,000 API calls/month",
+      "5 GB storage",
+      "Email support",
+      "99.9% uptime SLA",
+    ],
+    cta: "Get Started",
+  },
+  {
+    id: "growth",
+    name: "Growth",
+    price: {
+      monthly: 49,
+      yearly: 39,
+    },
+    description: "For growing businesses",
+    features: [
+      "100,000 API calls/month",
+      "50 GB storage",
+      "Priority email support",
+      "99.95% uptime SLA",
+      "Advanced analytics",
+    ],
+    cta: "Get Started",
+    popular: true,
+  },
+  {
+    id: "scale",
+    name: "Scale",
+    price: {
+      monthly: 199,
+      yearly: 159,
+    },
+    description: "For high-volume apps",
+    features: [
+      "1M API calls/month",
+      "500 GB storage",
+      "24/7 phone & chat support",
+      "99.99% uptime SLA",
+      "Custom integrations",
+    ],
+    cta: "Get Started",
+  },
+];
+```
+
+## Example 5: Lifetime Deal
+
+Create a one-time payment tier:
+
+```tsx config/index.ts
+export const PAYMENT_FREQUENCIES = ["monthly", "yearly", "lifetime"];
+
+export const TIERS: PricingTier[] = [
+  // ... other tiers
+  {
+    id: "lifetime",
+    name: "Lifetime Access",
+    price: {
+      monthly: 999,  // Show same price for all frequencies
+      yearly: 999,
+      lifetime: 999,
+    },
+    description: "Pay once, use forever",
+    features: [
+      "All Pro features",
+      "Lifetime updates",
+      "Priority support",
+      "No recurring fees",
+      "Future features included",
+    ],
+    cta: "Buy Lifetime Access",
+    highlighted: true,
+  },
+];
+```
+
+<Note>
+  When adding a "lifetime" payment frequency, you'll need to update the Tab component to display it properly and handle the special pricing logic.
+</Note>
+
+## Multiple Pricing Frequencies
+
+You can support different billing cycles:
+
+```tsx config/index.ts
+// Support quarterly billing
+export const PAYMENT_FREQUENCIES = ["monthly", "quarterly", "yearly"];
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "pro",
+    name: "Pro",
+    price: {
+      monthly: 29,
+      quarterly: 25,  // ~14% discount
+      yearly: 20,     // ~31% discount
+    },
+    description: "For professionals",
+    features: [
+      "All features",
+      "Priority support",
+      "Advanced analytics",
+    ],
+    cta: "Get Started",
+  },
+];
+```
+
+## Dynamic Tier Configuration
+
+Load tiers from an API or CMS:
+
+```tsx lib/pricing.ts
+import { PricingTier } from "@/config";
+
+export async function getPricingTiers(): Promise<PricingTier[]> {
+  // Fetch from your API
+  const response = await fetch("/api/pricing-tiers");
+  const tiers = await response.json();
+  
+  return tiers;
+}
+```
+
+Then use it in your component:
+
+```tsx components/DynamicPricing.tsx
+"use client";
+
+import { PricingCard } from "@/components/PricingCard";
+import { PricingHeader } from "@/components/PricingHeader";
+import { PAYMENT_FREQUENCIES } from "@/config";
+import { getPricingTiers } from "@/lib/pricing";
+import { useState, useEffect } from "react";
+
+export const DynamicPricing = () => {
+  const [tiers, setTiers] = useState([]);
+  const [selectedPaymentFreq, setSelectedPaymentFreq] = useState(
+    PAYMENT_FREQUENCIES[0],
+  );
+
+  useEffect(() => {
+    getPricingTiers().then(setTiers);
+  }, []);
+
+  return (
+    <section className="flex flex-col items-center gap-10 py-10">
+      <PricingHeader
+        title="Plans and Pricing"
+        subtitle="Choose the perfect plan for your needs"
+        frequencies={PAYMENT_FREQUENCIES}
+        selectedFrequency={selectedPaymentFreq}
+        onFrequencyChange={setSelectedPaymentFreq}
+      />
+
+      <div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {tiers.map((tier, i) => (
+          <PricingCard
+            key={i}
+            tier={tier}
+            paymentFrequency={selectedPaymentFreq}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+```
+
+## Adding Feature Comparisons
+
+Create a detailed comparison with feature availability:
+
+```tsx config/index.ts
+export interface PricingTier {
+  // ... existing fields
+  featureDetails?: {
+    feature: string;
+    included: boolean | string; // true, false, or custom text like "Up to 5"
+  }[];
+}
+
+export const TIERS: PricingTier[] = [
+  {
+    id: "basic",
+    name: "Basic",
+    // ... other fields
+    featureDetails: [
+      { feature: "Projects", included: "Up to 3" },
+      { feature: "Team members", included: "1" },
+      { feature: "Storage", included: "5 GB" },
+      { feature: "API access", included: false },
+      { feature: "Priority support", included: false },
+    ],
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    // ... other fields
+    featureDetails: [
+      { feature: "Projects", included: "Unlimited" },
+      { feature: "Team members", included: "Up to 10" },
+      { feature: "Storage", included: "100 GB" },
+      { feature: "API access", included: true },
+      { feature: "Priority support", included: true },
+    ],
+  },
+];
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Keep features concise">
+    Use short, clear feature descriptions. Aim for 3-5 words per feature.
+    
+    **Good:** "Priority email support"
+    
+    **Bad:** "Get prioritized email support with faster response times from our dedicated team"
+  </Accordion>
+
+  <Accordion title="Order tiers logically">
+    Typically, order from least to most expensive, with free tiers first. Place your most popular tier in the center for visual balance.
+  </Accordion>
+
+  <Accordion title="Use popular and highlighted wisely">
+    Only mark ONE tier as `popular: true` (your recommended option). Use `highlighted: true` sparingly for premium or enterprise tiers.
+  </Accordion>
+
+  <Accordion title="Consistent pricing structure">
+    Every tier should have prices for all payment frequencies, even if they're the same value.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="palette" href="/examples/theming">
+    Customize the visual appearance of your pricing tiers
+  </Card>
+  <Card title="PricingCard Component" icon="rectangle-wide" href="/components/pricing-card">
+    Complete API documentation for PricingCard
+  </Card>
+  <Card title="Pricing Component" icon="code" href="/components/pricing">
+    Full Pricing component API reference
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration/tiers">
+    Learn about all configuration options
+  </Card>
+</CardGroup>

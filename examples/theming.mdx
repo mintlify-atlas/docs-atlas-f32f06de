@@ -1,0 +1,481 @@
+---
+title: 'Theming'
+description: 'Customize colors, dark mode, and styling for your pricing components'
+---
+
+## Overview
+
+The shadcn-pricing-page components are built on top of Tailwind CSS and shadcn/ui, giving you full control over theming through CSS variables, Tailwind classes, and component customization.
+
+## Dark Mode Support
+
+The components automatically support dark mode through Tailwind's dark mode classes.
+
+### Setting Up Dark Mode
+
+<Steps>
+  <Step title="Configure Tailwind">
+    Ensure your `tailwind.config.ts` has dark mode enabled:
+
+    ```ts tailwind.config.ts
+    import type { Config } from "tailwindcss";
+
+    const config: Config = {
+      darkMode: ["class"], // or ["class", "selector", '[data-theme="dark"]']
+      content: [
+        "./pages/**/*.{ts,tsx}",
+        "./components/**/*.{ts,tsx}",
+        "./app/**/*.{ts,tsx}",
+      ],
+      // ... rest of config
+    };
+
+    export default config;
+    ```
+  </Step>
+
+  <Step title="Add Dark Mode Toggle">
+    Create a theme provider and toggle button:
+
+    ```tsx components/ThemeProvider.tsx
+    "use client";
+
+    import { ThemeProvider as NextThemesProvider } from "next-themes";
+    import { type ThemeProviderProps } from "next-themes/dist/types";
+
+    export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+      return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+    }
+    ```
+
+    ```tsx app/layout.tsx
+    import { ThemeProvider } from "@/components/ThemeProvider";
+
+    export default function RootLayout({ children }) {
+      return (
+        <html lang="en" suppressHydrationWarning>
+          <body>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+  </Step>
+
+  <Step title="Test Dark Mode">
+    The pricing components will automatically adapt to dark mode:
+
+    ```tsx
+    import { Pricing } from "@/components/Pricing";
+
+    export default function PricingPage() {
+      return <Pricing />;
+    }
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  The `PricingCard` component has special dark mode styling for highlighted and popular tiers, including different gradient overlays.
+</Tip>
+
+## Customizing Colors
+
+The components use CSS variables defined in your `globals.css` file.
+
+### Using CSS Variables
+
+```css app/globals.css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    /* ... other variables */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    /* ... other variables */
+  }
+}
+```
+
+### Custom Color Schemes
+
+<CodeGroup>
+```css Purple Theme
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 263 70% 10%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 263 40% 95%;
+    --accent-foreground: 263 70% 50%;
+  }
+
+  .dark {
+    --background: 263 30% 8%;
+    --foreground: 263 10% 95%;
+    --primary: 263 70% 60%;
+    --primary-foreground: 263 30% 8%;
+    --accent: 263 30% 15%;
+    --accent-foreground: 263 70% 80%;
+  }
+}
+```
+
+```css Green Theme
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 142 70% 10%;
+    --primary: 142 70% 45%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 142 40% 95%;
+    --accent-foreground: 142 70% 45%;
+  }
+
+  .dark {
+    --background: 142 30% 8%;
+    --foreground: 142 10% 95%;
+    --primary: 142 70% 50%;
+    --primary-foreground: 142 30% 8%;
+    --accent: 142 30% 15%;
+    --accent-foreground: 142 70% 70%;
+  }
+}
+```
+
+```css Ocean Theme
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 200 70% 10%;
+    --primary: 200 95% 45%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 200 40% 95%;
+    --accent-foreground: 200 95% 45%;
+  }
+
+  .dark {
+    --background: 200 30% 8%;
+    --foreground: 200 10% 95%;
+    --primary: 200 95% 50%;
+    --primary-foreground: 200 30% 8%;
+    --accent: 200 30% 15%;
+    --accent-foreground: 200 95% 60%;
+  }
+}
+```
+</CodeGroup>
+
+## Customizing the Popular Badge
+
+The popular badge uses an orange color by default. You can customize it:
+
+### Method 1: Inline Customization
+
+Modify the `PricingCard.tsx` component:
+
+```tsx components/PricingCard.tsx
+{isPopular && (
+  <Badge className="mt-1 bg-blue-600 px-1 py-0 text-white hover:bg-blue-700">
+    ⭐ Recommended
+  </Badge>
+)}
+```
+
+### Method 2: CSS Variable
+
+Define a custom variable and use it:
+
+```css app/globals.css
+@layer base {
+  :root {
+    --popular-badge: 217 91% 60%; /* Blue */
+  }
+
+  .dark {
+    --popular-badge: 217 91% 70%;
+  }
+}
+```
+
+```tsx components/PricingCard.tsx
+{isPopular && (
+  <Badge className="mt-1 bg-[hsl(var(--popular-badge))] px-1 py-0 text-white">
+    🔥 Most Popular
+  </Badge>
+)}
+```
+
+## Customizing Background Effects
+
+The pricing cards have special background effects for highlighted and popular tiers.
+
+### Highlighted Background (Grid Pattern)
+
+```tsx components/PricingCard.tsx
+// Default implementation
+const HighlightedBackground = () => (
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:45px_45px] opacity-100 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] dark:opacity-30" />
+);
+```
+
+Customize the grid pattern:
+
+```tsx components/PricingCard.tsx
+// Smaller grid
+const HighlightedBackground = () => (
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:20px_20px] opacity-100 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] dark:opacity-30" />
+);
+
+// Different color
+const HighlightedBackground = () => (
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f620_1px,transparent_1px),linear-gradient(to_bottom,#3b82f620_1px,transparent_1px)] bg-[size:45px_45px] opacity-100 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] dark:opacity-50" />
+);
+```
+
+### Popular Background (Gradient)
+
+```tsx components/PricingCard.tsx
+// Default implementation
+const PopularBackground = () => (
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+);
+```
+
+Customize the gradient:
+
+<CodeGroup>
+```tsx Blue Gradient
+const PopularBackground = () => (
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.3),rgba(255,255,255,0))]" />
+);
+```
+
+```tsx Green Gradient
+const PopularBackground = () => (
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,197,94,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,197,94,0.3),rgba(255,255,255,0))]" />
+);
+```
+
+```tsx Purple Gradient
+const PopularBackground = () => (
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(168,85,247,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(168,85,247,0.3),rgba(255,255,255,0))]" />
+);
+```
+</CodeGroup>
+
+## Customizing Border and Outline
+
+The popular tier has a custom outline color:
+
+```tsx components/PricingCard.tsx
+// Default
+className={cn(
+  "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+  isPopular && "outline outline-[rgba(120,119,198)]",
+)}
+
+// Custom color
+className={cn(
+  "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+  isPopular && "outline outline-blue-500",
+)}
+
+// Thicker outline
+className={cn(
+  "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+  isPopular && "outline outline-2 outline-purple-500",
+)}
+```
+
+## Customizing Typography
+
+Adjust font sizes and weights:
+
+```tsx components/PricingCard.tsx
+// Larger title
+<h2 className="flex items-center gap-3 text-2xl font-bold capitalize">
+  {tier.name}
+</h2>
+
+// Larger price
+<NumberFlow
+  format={{
+    style: "currency",
+    currency: "USD",
+    trailingZeroDisplay: "stripIfInteger",
+  }}
+  value={price}
+  className="text-5xl font-bold"
+/>
+
+// Different feature styling
+<li className="flex items-center gap-2 text-base font-normal">
+  <BadgeCheck strokeWidth={1.5} size={18} />
+  {feature}
+</li>
+```
+
+## Custom Card Layout
+
+Create a completely custom card layout:
+
+```tsx components/CustomPricingCard.tsx
+import { TIERS } from "@/config";
+import { Button } from "@/ui/button";
+import { Check } from "lucide-react";
+
+export const CustomPricingCard = ({
+  tier,
+  paymentFrequency,
+}: {
+  tier: (typeof TIERS)[0];
+  paymentFrequency: string;
+}) => {
+  const price = tier.price[paymentFrequency];
+
+  return (
+    <div className="group relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-white p-8 transition-all hover:border-primary hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
+      {/* Header */}
+      <div className="mb-6 text-center">
+        <h3 className="text-2xl font-bold">{tier.name}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {tier.description}
+        </p>
+      </div>
+
+      {/* Price */}
+      <div className="mb-8 text-center">
+        <div className="text-5xl font-extrabold">
+          {typeof price === "number" ? `$${price}` : price}
+        </div>
+        {typeof price === "number" && (
+          <div className="text-sm text-muted-foreground">per user/month</div>
+        )}
+      </div>
+
+      {/* Features */}
+      <ul className="mb-8 space-y-3">
+        {tier.features.map((feature, i) => (
+          <li key={i} className="flex items-start gap-3">
+            <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+            <span className="text-sm">{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* CTA */}
+      <Button className="w-full" size="lg">
+        {tier.cta}
+      </Button>
+    </div>
+  );
+};
+```
+
+## Responsive Design Customization
+
+Adjust the grid layout for different screen sizes:
+
+```tsx components/Pricing.tsx
+// Default: 1 column on mobile, 2 on tablet, 4 on desktop
+<div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+  {TIERS.map((tier, i) => (
+    <PricingCard key={i} tier={tier} paymentFrequency={selectedPaymentFreq} />
+  ))}
+</div>
+
+// 3 columns max
+<div className="grid w-full max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-3">
+  {TIERS.map((tier, i) => (
+    <PricingCard key={i} tier={tier} paymentFrequency={selectedPaymentFreq} />
+  ))}
+</div>
+
+// 2 columns max (for fewer tiers)
+<div className="grid w-full max-w-4xl gap-8 lg:grid-cols-2">
+  {TIERS.map((tier, i) => (
+    <PricingCard key={i} tier={tier} paymentFrequency={selectedPaymentFreq} />
+  ))}
+</div>
+```
+
+## Animation Customization
+
+Add custom animations and transitions:
+
+```tsx components/PricingCard.tsx
+import { motion } from "framer-motion";
+
+export const AnimatedPricingCard = ({ tier, paymentFrequency, index }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileHover={{ scale: 1.05 }}
+      className="relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow"
+    >
+      {/* Card content */}
+    </motion.div>
+  );
+};
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Maintain contrast ratios">
+    Ensure text remains readable in both light and dark modes. Use tools like [Contrast Checker](https://webaim.org/resources/contrastchecker/) to verify WCAG compliance.
+  </Accordion>
+
+  <Accordion title="Test on multiple devices">
+    Verify your theming looks good on mobile, tablet, and desktop screens. Pay attention to how background effects render on different devices.
+  </Accordion>
+
+  <Accordion title="Keep animations subtle">
+    Hover effects and transitions should enhance the experience, not distract. Respect `prefers-reduced-motion` for accessibility.
+  </Accordion>
+
+  <Accordion title="Use semantic color names">
+    When defining custom colors, use semantic names like `--primary`, `--accent` rather than specific colors like `--blue-500`.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Basic Usage" icon="rocket" href="/examples/basic-usage">
+    Learn the basics of integrating the component
+  </Card>
+  <Card title="Custom Tiers" icon="layer-group" href="/examples/custom-tiers">
+    Create custom pricing tiers
+  </Card>
+  <Card title="PricingCard Component" icon="code" href="/components/pricing-card">
+    Complete styling and prop reference
+  </Card>
+  <Card title="Styling Guide" icon="paintbrush" href="/configuration/styling">
+    Advanced customization techniques
+  </Card>
+</CardGroup>

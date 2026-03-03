@@ -1,0 +1,512 @@
+---
+title: Styling & Theming
+description: Customize colors, borders, animations, and visual appearance
+---
+
+## Overview
+
+The shadcn pricing page uses a combination of Tailwind CSS, CSS variables, and shadcn/ui theming for complete visual customization. You can customize colors, borders, animations, and more without touching component code.
+
+## Color System
+
+### CSS Variables
+
+All colors are defined using HSL CSS variables in `app/globals.css`. This approach enables easy theme switching and consistent styling across the application.
+
+#### Light Mode Colors
+
+```css app/globals.css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 10% 3.9%;
+  --radius: 0.75rem;
+}
+```
+
+#### Dark Mode Colors
+
+```css app/globals.css
+.dark {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+}
+```
+
+### Tailwind Configuration
+
+Colors are mapped to Tailwind classes in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+theme: {
+  extend: {
+    colors: {
+      background: "hsl(var(--background))",
+      foreground: "hsl(var(--foreground))",
+      card: {
+        DEFAULT: "hsl(var(--card))",
+        foreground: "hsl(var(--card-foreground))",
+      },
+      primary: {
+        DEFAULT: "hsl(var(--primary))",
+        foreground: "hsl(var(--primary-foreground))",
+      },
+      secondary: {
+        DEFAULT: "hsl(var(--secondary))",
+        foreground: "hsl(var(--secondary-foreground))",
+      },
+      muted: {
+        DEFAULT: "hsl(var(--muted))",
+        foreground: "hsl(var(--muted-foreground))",
+      },
+      accent: {
+        DEFAULT: "hsl(var(--accent))",
+        foreground: "hsl(var(--accent-foreground))",
+      },
+      border: "hsl(var(--border))",
+      input: "hsl(var(--input))",
+      ring: "hsl(var(--ring))",
+    },
+  },
+}
+```
+
+## Customizing Colors
+
+### Change Brand Colors
+
+To customize your brand colors, modify the CSS variables in `app/globals.css`:
+
+```css app/globals.css
+:root {
+  /* Brand primary color - your main brand color */
+  --primary: 220 90% 56%;  /* Blue */
+  --primary-foreground: 0 0% 100%;  /* White text on primary */
+  
+  /* Accent color - for highlighted tiers */
+  --accent: 142 76% 36%;  /* Green */
+  --accent-foreground: 0 0% 100%;  /* White text on accent */
+}
+```
+
+<Tip>
+Use HSL values without the `hsl()` wrapper. The format is: `hue saturation% lightness%`
+</Tip>
+
+### Popular Tier Outline Color
+
+The purple outline on popular tiers is hardcoded in `components/PricingCard.tsx`:
+
+```tsx components/PricingCard.tsx
+isPopular && "outline outline-[rgba(120,119,198)]"
+```
+
+To customize:
+
+```tsx components/PricingCard.tsx
+// Change to your brand color
+isPopular && "outline outline-[rgba(59,130,246)]"  // Blue
+isPopular && "outline outline-[rgba(34,197,94)]"   // Green
+isPopular && "outline outline-[rgba(239,68,68)]"   // Red
+```
+
+Or use a CSS variable:
+
+```tsx components/PricingCard.tsx
+isPopular && "outline outline-primary"
+```
+
+### Popular Badge Color
+
+The "Most Popular" badge uses a fixed orange background:
+
+```tsx components/PricingCard.tsx
+<Badge className="mt-1 bg-orange-900 px-1 py-0 text-white hover:bg-orange-900">
+  🔥 Most Popular
+</Badge>
+```
+
+Customize the badge:
+
+```tsx components/PricingCard.tsx
+// Use your brand color
+<Badge className="mt-1 bg-primary px-1 py-0 text-primary-foreground">
+  ⭐ Most Popular
+</Badge>
+```
+
+## Border Radius
+
+### Global Border Radius
+
+Control border radius with the `--radius` CSS variable:
+
+```css app/globals.css
+:root {
+  --radius: 0.75rem;  /* Default: rounded corners */
+}
+```
+
+Common values:
+
+```css
+--radius: 0rem;      /* Sharp corners */
+--radius: 0.5rem;    /* Subtle rounding */
+--radius: 0.75rem;   /* Default */
+--radius: 1rem;      /* More rounded */
+--radius: 2rem;      /* Very rounded */
+```
+
+### Tailwind Radius Utilities
+
+The radius is mapped to Tailwind utilities in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+borderRadius: {
+  lg: "var(--radius)",              // 0.75rem
+  md: "calc(var(--radius) - 2px)",  // 0.75rem - 2px
+  sm: "calc(var(--radius) - 4px)",  // 0.75rem - 4px
+}
+```
+
+### Pricing Card Border Radius
+
+Pricing cards use `rounded-2xl` (1rem) by default:
+
+```tsx components/PricingCard.tsx
+<div className="... rounded-2xl ...">
+```
+
+To customize, edit the className:
+
+```tsx components/PricingCard.tsx
+<div className="... rounded-lg ...">
+  {/* or rounded-xl, rounded-3xl, etc. */}
+</div>
+```
+
+## Animations
+
+### Shine Animation
+
+A shine animation is available for highlighting elements. Defined in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+keyframes: {
+  shine: {
+    from: { backgroundPosition: "200% 0" },
+    to: { backgroundPosition: "-200% 0" },
+  },
+},
+animation: {
+  shine: "shine 8s ease-in-out infinite",
+}
+```
+
+Usage:
+
+```tsx
+<div className="animate-shine bg-gradient-to-r from-transparent via-white/10 to-transparent">
+  Your content
+</div>
+```
+
+### Custom Animations
+
+Add your own animations in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+keyframes: {
+  shine: {
+    from: { backgroundPosition: "200% 0" },
+    to: { backgroundPosition: "-200% 0" },
+  },
+  // Add custom animation
+  pulse: {
+    '0%, 100%': { opacity: '1' },
+    '50%': { opacity: '0.5' },
+  },
+  fadeIn: {
+    from: { opacity: '0', transform: 'translateY(10px)' },
+    to: { opacity: '1', transform: 'translateY(0)' },
+  },
+},
+animation: {
+  shine: "shine 8s ease-in-out infinite",
+  pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+  fadeIn: "fadeIn 0.5s ease-out",
+}
+```
+
+## Background Decorations
+
+### Highlighted Tier Background
+
+Highlighted tiers (with `highlighted: true`) display a grid pattern:
+
+```tsx components/PricingCard.tsx
+const HighlightedBackground = () => (
+  <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:45px_45px] opacity-100 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] dark:opacity-30" />
+);
+```
+
+Customize the grid:
+
+```tsx components/PricingCard.tsx
+// Smaller grid
+bg-[size:30px_30px]
+
+// Larger grid
+bg-[size:60px_60px]
+
+// Different color
+bg-[linear-gradient(to_right,#3b82f61a_1px,transparent_1px),linear-gradient(to_bottom,#3b82f61a_1px,transparent_1px)]
+```
+
+### Popular Tier Background
+
+Popular tiers display a radial gradient:
+
+```tsx components/PricingCard.tsx
+const PopularBackground = () => (
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+);
+```
+
+Customize the gradient color:
+
+```tsx components/PricingCard.tsx
+// Blue gradient
+bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.1),rgba(255,255,255,0))]
+
+// Green gradient
+bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,197,94,0.1),rgba(255,255,255,0))]
+```
+
+## Typography
+
+### Font Family
+
+The default font is Satoshi, configured in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+fontFamily: {
+  main: ["var(--font-satoshi)"],
+}
+```
+
+To use a different font:
+
+1. Update the font import in your root layout
+2. Update the Tailwind config:
+
+```typescript tailwind.config.ts
+fontFamily: {
+  main: ["Inter", "sans-serif"],
+}
+```
+
+### Font Sizes
+
+Pricing card typography uses standard Tailwind classes:
+
+```tsx components/PricingCard.tsx
+// Tier name
+<h2 className="text-xl font-medium">  
+
+// Price
+<NumberFlow className="text-4xl font-medium" />
+
+// Description
+<h3 className="text-sm font-medium">
+
+// Features
+<li className="text-sm font-medium">
+```
+
+Customize by editing the component classes.
+
+## Shadows & Borders
+
+### Card Shadow
+
+Pricing cards use a subtle shadow:
+
+```tsx components/PricingCard.tsx
+<div className="... shadow ...">
+```
+
+Customize the shadow:
+
+```tsx
+// No shadow
+className="..."
+
+// More prominent
+className="... shadow-lg ..."
+
+// Extra prominent
+className="... shadow-2xl ..."
+```
+
+### Border Styling
+
+Cards have a subtle border:
+
+```tsx components/PricingCard.tsx
+<div className="... border ...">
+```
+
+Customize:
+
+```tsx
+// Thicker border
+className="... border-2 ..."
+
+// Custom color
+className="... border border-primary/20 ..."
+
+// No border
+className="..."  // Remove "border"
+```
+
+## Dark Mode
+
+### Enabling Dark Mode
+
+Dark mode is configured in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+darkMode: ["class"],
+```
+
+This means dark mode is controlled by adding the `dark` class to the `<html>` element.
+
+### Dark Mode Utilities
+
+Use Tailwind's `dark:` prefix for dark mode styles:
+
+```tsx
+<div className="bg-white dark:bg-gray-900 text-black dark:text-white">
+  Content adapts to theme
+</div>
+```
+
+### Automatic Dark Mode Variables
+
+All CSS variables automatically switch values in dark mode. No manual class management needed for colors defined in the color system.
+
+## shadcn/ui Configuration
+
+The project uses shadcn/ui with the "New York" style:
+
+```json components.json
+{
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "app/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  }
+}
+```
+
+### Base Color Options
+
+You can change the base color scheme:
+
+```json components.json
+"baseColor": "slate"    // Cool gray
+"baseColor": "gray"     // Neutral gray
+"baseColor": "zinc"     // Modern gray
+"baseColor": "neutral"  // Default
+"baseColor": "stone"    // Warm gray
+```
+
+After changing, regenerate your CSS variables or update them manually in `app/globals.css`.
+
+## Complete Customization Example
+
+Here's a full example creating a blue-themed pricing page:
+
+```css app/globals.css
+:root {
+  /* Blue brand theme */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;  /* Blue */
+  --primary-foreground: 210 40% 98%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --border: 214.3 31.8% 91.4%;
+  --radius: 1rem;  /* More rounded */
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;  /* Lighter blue for dark mode */
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+}
+```
+
+```tsx components/PricingCard.tsx
+// Update popular outline to match blue theme
+isPopular && "outline outline-primary/50"
+
+// Update badge
+<Badge className="mt-1 bg-primary px-1 py-0 text-primary-foreground">
+  ⭐ Most Popular
+</Badge>
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Pricing Tiers" icon="layer-group" href="/configuration/tiers">
+    Configure your pricing plans and features
+  </Card>
+  <Card title="Components" icon="cube" href="/components/pricing-card">
+    Learn about the PricingCard component
+  </Card>
+</CardGroup>

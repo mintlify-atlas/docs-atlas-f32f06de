@@ -1,0 +1,224 @@
+---
+title: Tab
+description: An animated tab button component with smooth transitions and optional discount badge.
+---
+
+The `Tab` component is an interactive button that displays text with a smooth animated background transition when selected. It's commonly used for toggle switches like payment frequency selectors.
+
+## Props
+
+<ParamField path="text" type="string" required>
+  The text content displayed in the tab (automatically capitalized).
+</ParamField>
+
+<ParamField path="selected" type="boolean" required>
+  Whether this tab is currently selected. When `true`, displays the animated background.
+</ParamField>
+
+<ParamField path="setSelected" type="(text: string) => void" required>
+  Callback function invoked when the tab is clicked. Receives the tab's text as an argument.
+</ParamField>
+
+<ParamField path="discount" type="boolean" default="false">
+  When `true`, displays a "Save 35%" badge next to the tab text and adjusts the layout to accommodate it.
+</ParamField>
+
+## Usage
+
+<Tabs>
+  <Tab title="Basic">
+    ```tsx
+    import { Tab } from "@/ui/tab";
+    import { useState } from "react";
+
+    export default function Example() {
+      const [selected, setSelected] = useState("option1");
+
+      return (
+        <div className="flex rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+          <Tab
+            text="option1"
+            selected={selected === "option1"}
+            setSelected={setSelected}
+          />
+          <Tab
+            text="option2"
+            selected={selected === "option2"}
+            setSelected={setSelected}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tab>
+  
+  <Tab title="With Discount">
+    ```tsx
+    import { Tab } from "@/ui/tab";
+    import { useState } from "react";
+
+    export default function PricingToggle() {
+      const [frequency, setFrequency] = useState("monthly");
+
+      return (
+        <div className="flex rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+          <Tab
+            text="monthly"
+            selected={frequency === "monthly"}
+            setSelected={setFrequency}
+          />
+          <Tab
+            text="yearly"
+            selected={frequency === "yearly"}
+            setSelected={setFrequency}
+            discount={true}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Multiple Tabs">
+    ```tsx
+    import { Tab } from "@/ui/tab";
+    import { useState } from "react";
+
+    export default function MultiTab() {
+      const [selected, setSelected] = useState("monthly");
+      const options = ["monthly", "quarterly", "yearly"];
+
+      return (
+        <div className="flex rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+          {options.map((option) => (
+            <Tab
+              key={option}
+              text={option}
+              selected={selected === option}
+              setSelected={setSelected}
+              discount={option === "yearly"}
+            />
+          ))}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Animation
+
+The component uses Framer Motion for smooth tab transitions:
+
+```tsx
+{selected && (
+  <motion.span
+    layoutId="tab"
+    transition={{ type: "spring", duration: 0.4 }}
+    className="absolute inset-0 z-0 rounded-full bg-background shadow-sm"
+  ></motion.span>
+)}
+```
+
+### Animation Properties
+
+- **layoutId**: `"tab"` - Enables shared layout animations between tabs
+- **Type**: Spring animation for natural movement
+- **Duration**: 0.4 seconds
+- **Visual**: White background with subtle shadow
+
+## Discount Badge
+
+When `discount={true}`, the tab displays a badge:
+
+```tsx
+{discount && (
+  <Badge
+    className={cn(
+      "relative z-10 whitespace-nowrap bg-gray-100 text-xs text-black shadow-none hover:bg-gray-100",
+      selected
+        ? "bg-[#F3F4F6] hover:bg-[#F3F4F6]"
+        : "bg-gray-300 hover:bg-gray-300",
+    )}
+  >
+    Save 35%
+  </Badge>
+)}
+```
+
+### Badge Behavior
+
+- **Text**: "Save 35%" (hardcoded)
+- **Selected State**: Lighter gray background (`#F3F4F6`)
+- **Unselected State**: Darker gray background (`gray-300`)
+- **Positioning**: Displayed next to tab text with 2.5 gap
+
+## Styling
+
+The tab button includes:
+
+- **Text**: Capitalized, small (text-sm), semi-bold
+- **Padding**: `px-4 py-2`
+- **Layout**: Relative positioning for layered elements
+- **Z-index**: Text at z-10, background at z-0
+- **Transitions**: Smooth color transitions
+
+### Conditional Classes
+
+```tsx
+className={cn(
+  "relative w-fit px-4 py-2 text-sm font-semibold capitalize text-foreground transition-colors",
+  discount && "flex items-center justify-center gap-2.5",
+)}
+```
+
+When `discount={true}`, the button becomes a flex container with centered items and a 2.5 gap.
+
+## Layout ID Concept
+
+The `layoutId="tab"` enables smooth morphing animations:
+
+1. When a tab is selected, its background appears
+2. When another tab is clicked, the background animates from the old position to the new position
+3. All tabs with the same `layoutId` share this animation
+
+This creates a sliding effect as the selection changes.
+
+## Best Practices
+
+1. **Container**: Wrap tabs in a rounded container with padding:
+   ```tsx
+   <div className="flex rounded-full bg-[#F3F4F6] p-1 dark:bg-[#222]">
+   ```
+
+2. **State Management**: Use a single state variable to track selection:
+   ```tsx
+   const [selected, setSelected] = useState("option1");
+   ```
+
+3. **Unique Keys**: When mapping tabs, provide unique keys:
+   ```tsx
+   {options.map((option) => (
+     <Tab key={option} ... />
+   ))}
+   ```
+
+4. **Accessibility**: The component renders a semantic `<button>` element
+
+## Typography
+
+The text is automatically:
+- Capitalized via CSS (`capitalize` class)
+- Rendered with semi-bold weight
+- Sized at text-sm (0.875rem / 14px)
+- Colored with foreground color
+
+## Dependencies
+
+- `motion/react` - Framer Motion for animations
+- `@/ui/badge` - Badge component for discount display
+- `@/lib/utils` - cn utility for className merging
+
+## Source Code
+
+View the complete source code at `components/ui/tab.tsx`
